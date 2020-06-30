@@ -7,34 +7,34 @@ const { log } = console;
 const rightExitCode = 0;
 
 const lintRepo = function (cloneURL, name) {
-  const deleteChild = spawn('rm', ['-rf', name]);
-  log('deleting repo');
+  log(`Cloning repo ${cloneURL}`);
+  const child = spawn('git', ['clone', cloneURL]);
   return new Promise((res) => {
-    deleteChild.on('exit', (code) => {
+    child.on('exit', (code) => {
       if (code === rightExitCode) {
-        log(`Cloning repo ${cloneURL}`);
-        const child = spawn('git', ['clone', cloneURL]);
-        const childPromise = new Promise((res) => {
-          child.on('exit', (code) => {
+        log('installing eslint');
+        const installEslint = spawn('npm', ['install', 'eslint']);
+        const lintProcess = new Promise((res) => {
+          installEslint.on('exit', (code) => {
             if (code === rightExitCode) {
-              log('installing eslint');
-              const installEslint = spawn('npm', ['install', 'eslint']);
-              const lintProcess = new Promise((res) => {
-                installEslint.on('exit', (code) => {
-                  if (code === rightExitCode) {
-                    log('linting');
-                    const do_ = spawn('eslint', ['*.js']);
-                    do_.stdout.setEncoding('utf-8');
-                    do_.stdout.on('data', res);
-                    do_.on('exit', log);
-                  }
-                });
+              log('linting');
+              const do_ = spawn('eslint', ['*.js']);
+              do_.stdout.setEncoding('utf-8');
+              do_.stdout.on('data', (data) => {
+                log(data);
+                res(
+                  new Promise((res) => {
+                    const deleteChild = spawn('rm', ['-rf', name]);
+                    log('deleting repo');
+                    deleteChild.on('exit', res);
+                  })
+                );
               });
-              res(lintProcess);
+              do_.on('exit', log);
             }
           });
         });
-        res(childPromise);
+        res(lintProcess);
       }
     });
   });
