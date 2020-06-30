@@ -13,17 +13,6 @@ const cloneRepo = function (cloneURL) {
   });
 };
 
-const installEslint = function (repoName) {
-  return new Promise((res) => {
-    exec(`cd ${repoName}; npm init -y; npm install eslint`, (err, stdout) => {
-      if (err) {
-        throw new Error(err);
-      }
-      res(stdout);
-    });
-  });
-};
-
 const checkEslintrc = function (repoName) {
   return new Promise((res) => {
     const isLintFileAvailable = existsSync(`./${repoName}/.eslintrc`);
@@ -40,7 +29,7 @@ const checkEslintrc = function (repoName) {
 
 const lint = function (repoName, req, response) {
   return new Promise((res) => {
-    exec(`cd ${repoName}; eslint ./**/*.js`, (err, stdout, stderr) => {
+    exec(`eslint ${repoName}/**/*.js`, (err, stdout, stderr) => {
       const eslintReport = { ...req.body, eslint: { warnings: stdout } };
       if (err) {
         eslintReport.eslint = { errors: stderr, warnings: stdout };
@@ -66,10 +55,6 @@ const lintRepo = function (req, res) {
     {
       title: 'cloning repo',
       task: () => cloneRepo(cloneURL),
-    },
-    {
-      title: 'installing eslint',
-      task: () => installEslint(repoName),
     },
     {
       title: 'checking .eslintrc',
