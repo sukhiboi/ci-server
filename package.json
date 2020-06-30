@@ -17,8 +17,21 @@
     "chai": "^4.2.0",
     "eslint": "^7.3.1",
     "express": "^4.17.1",
+    "listr": "^0.14.3",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
     "redis": "^3.0.2"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sukhiboi/linter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sukhiboi/linter/issues"
+  },
+  "homepage": "https://github.com/sukhiboi/linter#readme"
 }

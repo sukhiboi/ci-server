@@ -42,7 +42,6 @@
       }
     ],
     "max-statements": "error",
-    "no-console": "error",
     "no-else-return": "error",
     "no-eval": "error",
     "no-implicit-globals": "error",
