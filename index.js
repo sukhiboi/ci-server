@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 
 app.post('/github', (req, res) => {
-    const { params, body, query } = res;
+    const { params, body, query } = req;
     console.log(params, body, query);
 });
 
