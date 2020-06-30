@@ -1,0 +1,21 @@
+{
+  "name": "linter",
+  "version": "1.0.0",
+  "description": "created by sukhiboi and abhilash",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc mocha"
+  },
+  "keywords": [
+    "linter"
+  ],
+  "author": "sukhiboi, abhilash",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "express": "^4.17.1",
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0",
+    "redis": "^3.0.2"
+  }
+}
