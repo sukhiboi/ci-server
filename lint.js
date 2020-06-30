@@ -41,18 +41,11 @@ const checkEslintrc = function (repoName) {
 const lint = function (repoName, req, response) {
   return new Promise((res) => {
     exec(`cd ${repoName}; eslint ./**/*.js`, (err, stdout, stderr) => {
+      const eslintReport = { ...req.body, eslint: { warnings: stdout } };
       if (err) {
-        response.end(
-          JSON.stringify({
-            ...req.body,
-            eslint: { errors: stderr, warnings: stdout },
-          })
-        );
-      } else {
-        response.end(
-          JSON.stringify({ ...req.body, eslint: { warnings: stdout } })
-        );
+        eslintReport.eslint = { errors: stderr, warnings: stdout };
       }
+      response.end(JSON.stringify(eslintReport));
       res();
     });
   });
