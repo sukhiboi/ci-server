@@ -14,7 +14,7 @@ const cloneRepo = function (cloneURL) {
 
 const installEslint = function (repoName) {
   return new Promise((res) => {
-    exec(`cd ${repoName}; npm init -y; npm install eslint`, (err, stdout) => {
+    exec(`cp -r eslint_modules/node_modules ${repoName};`, (err, stdout) => {
       if (err) {
         throw new Error(err);
       }
