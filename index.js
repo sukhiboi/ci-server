@@ -7,33 +7,40 @@ const { log } = console;
 const rightExitCode = 0;
 
 const lintRepo = function (cloneURL) {
+  log(`Cloning repo ${cloneURL}`);
   const child = spawn('git', ['clone', cloneURL]);
-  child.on('exit', (code) => {
-    if (code === rightExitCode) {
-      log('installing eslint');
-      const installEslint = spawn('npm', ['install', 'eslint']);
-      installEslint.on('exit', (code) => {
-        if (code === rightExitCode) {
-          log('linting');
-          const do_ = spawn('eslint', ['*.js']);
-          do_.stdout.setEncoding('utf-8');
-          do_.stdout.on('data', log);
-          do_.on('exit', log);
-        }
-      });
-    }
+  return new Promise((res) => {
+    child.on('exit', (code) => {
+      if (code === rightExitCode) {
+        log('installing eslint');
+        const installEslint = spawn('npm', ['install', 'eslint']);
+        const lintProcess = new Promise((res) => {
+          installEslint.on('exit', (code) => {
+            if (code === rightExitCode) {
+              log('linting');
+              const do_ = spawn('eslint', ['*.js']);
+              do_.stdout.setEncoding('utf-8');
+              do_.stdout.on('data', res);
+              do_.on('exit', log);
+            }
+          });
+        });
+        res(lintProcess);
+      }
+    });
   });
 };
 
 app.use(bodyParser.json());
 app.post('/github', (req, res) => {
-  if (req.body.clone_url) {
-    typeof req.body;
-    log(req.body.clone_url);
-    lintRepo(req.body.clone_url);
-    res.send(`working on ${req.body.repository.fullname}`);
+  if (req.body.repository.clone_url) {
+    lintRepo(req.body.repository.clone_url).then((data) => {
+      log(data, 'done');
+    });
+  } else {
+    res.send('invalid request');
   }
-  res.send('invalid request');
+  res.end();
 });
 
 const PORT = process.env.PORT || 4000;
