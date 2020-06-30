@@ -6,26 +6,35 @@ const bodyParser = require('body-parser');
 const { log } = console;
 const rightExitCode = 0;
 
-const lintRepo = function (cloneURL) {
-  log(`Cloning repo ${cloneURL}`);
-  const child = spawn('git', ['clone', cloneURL]);
+const lintRepo = function (cloneURL, name) {
+  const deleteChild = spawn('rm', ['-rf', name]);
+  log('deleting repo');
   return new Promise((res) => {
-    child.on('exit', (code) => {
+    deleteChild.on('exit', (code) => {
       if (code === rightExitCode) {
-        log('installing eslint');
-        const installEslint = spawn('npm', ['install', 'eslint']);
-        const lintProcess = new Promise((res) => {
-          installEslint.on('exit', (code) => {
+        log(`Cloning repo ${cloneURL}`);
+        const child = spawn('git', ['clone', cloneURL]);
+        const childPromise = new Promise((res) => {
+          child.on('exit', (code) => {
             if (code === rightExitCode) {
-              log('linting');
-              const do_ = spawn('eslint', ['*.js']);
-              do_.stdout.setEncoding('utf-8');
-              do_.stdout.on('data', res);
-              do_.on('exit', log);
+              log('installing eslint');
+              const installEslint = spawn('npm', ['install', 'eslint']);
+              const lintProcess = new Promise((res) => {
+                installEslint.on('exit', (code) => {
+                  if (code === rightExitCode) {
+                    log('linting');
+                    const do_ = spawn('eslint', ['*.js']);
+                    do_.stdout.setEncoding('utf-8');
+                    do_.stdout.on('data', res);
+                    do_.on('exit', log);
+                  }
+                });
+              });
+              res(lintProcess);
             }
           });
         });
-        res(lintProcess);
+        res(childPromise);
       }
     });
   });
@@ -34,9 +43,11 @@ const lintRepo = function (cloneURL) {
 app.use(bodyParser.json());
 app.post('/github', (req, res) => {
   if (req.body.repository.clone_url) {
-    lintRepo(req.body.repository.clone_url).then((data) => {
-      log(data, 'done');
-    });
+    lintRepo(req.body.repository.clone_url, req.body.repository.name).then(
+      (data) => {
+        log(data, 'done');
+      }
+    );
   } else {
     res.send('invalid request');
   }
