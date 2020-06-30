@@ -28,6 +28,8 @@ const lintRepo = function (cloneURL) {
 app.use(bodyParser.json());
 app.post('/github', (req, res) => {
   if (req.body.clone_url) {
+    typeof req.body;
+    log(req.body.clone_url);
     lintRepo(req.body.clone_url);
     res.send(`working on ${req.body.repository.fullname}`);
   }
