@@ -1,9 +1,10 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 
+app.use(bodyParser.json());
 app.post('/github', (req, res) => {
-    const { params, body, query } = req;
-    console.log(params, body, query);
+  console.log(req.body);
 });
 
 const PORT = process.env.PORT || 4000;
