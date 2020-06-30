@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-app.post('/', (req, res) => {
+app.post('/github', (req, res) => {
     const { params, body, query } = res;
     console.log(params, body, query);
 });
