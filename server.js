@@ -11,8 +11,8 @@ const getJobDetails = function (payload, jobId) {
   const { id, clone_url, name } = payload.repository;
   const [commit] = payload.commits;
   const { message, author } = commit;
-  const repoDetails = ['clone_url', clone_url, 'name', name, 'id', id];
-  const commitDetails = ['author', author.name, 'message', message];
+  const repoDetails = ['cloneUrl', clone_url, 'repoName', name, 'id', id];
+  const commitDetails = ['author', author.name, 'commitMessage', message];
   const jobDetails = ['status', 'scheduled', 'jobId', jobId];
   return [...repoDetails, ...commitDetails, ...jobDetails];
 };
