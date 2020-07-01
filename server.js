@@ -14,7 +14,6 @@ const getJobDetails = function (payload, jobId) {
   const repoDetails = ['clone_url', clone_url, 'name', name, 'id', id];
   const commitDetails = ['author', author.name, 'message', message];
   const jobDetails = ['status', 'scheduled', 'jobId', jobId];
-  console.log([...repoDetails, ...commitDetails, ...jobDetails]);
   return [...repoDetails, ...commitDetails, ...jobDetails];
 };
 
