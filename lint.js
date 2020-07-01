@@ -27,14 +27,14 @@ const checkEslintrc = function (repoName) {
   });
 };
 
-const lint = function (repoName, req, response) {
+const lint = function (repoName, payload) {
   return new Promise((res) => {
     exec(`eslint ${repoName}/**/*.js`, (err, stdout, stderr) => {
-      const eslintReport = { ...req.body, eslint: { warnings: stdout } };
+      const eslintReport = { ...payload, eslint: { warnings: stdout } };
       if (err) {
         eslintReport.eslint = { errors: stderr, warnings: stdout };
       }
-      response.end(JSON.stringify(eslintReport));
+      //write to db
       res();
     });
   });
@@ -48,10 +48,14 @@ const deleteLocalRepo = function (repoName) {
   });
 };
 
-const lintRepo = function (req, res) {
-  const cloneURL = req.body.repository.clone_url;
-  const repoName = req.body.repository.name;
+const lintRepo = function (payload) {
+  const cloneURL = payload.repository.clone_url;
+  const repoName = payload.repository.name;
   const tasks = new Listr([
+    {
+      title: 'deleting any previous local repo',
+      task: () => deleteLocalRepo(repoName),
+    },
     {
       title: 'cloning repo',
       task: () => cloneRepo(cloneURL),
@@ -62,7 +66,7 @@ const lintRepo = function (req, res) {
     },
     {
       title: 'linting',
-      task: () => lint(repoName, req, res),
+      task: () => lint(repoName, payload),
     },
     {
       title: 'deleting local repo',
@@ -70,7 +74,9 @@ const lintRepo = function (req, res) {
     },
   ]);
   console.log(`Processing ${repoName}`);
-  tasks.run();
+  return new Promise((res) => {
+    res(tasks.run());
+  });
 };
 
 module.exports = { lintRepo };

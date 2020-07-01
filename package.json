@@ -1,16 +1,16 @@
 {
   "name": "linter",
   "version": "1.0.0",
-  "description": "created by sukhiboi and abhilash",
+  "description": "created by sukhiboi",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node server.js",
     "test": "nyc mocha"
   },
   "keywords": [
     "linter"
   ],
-  "author": "sukhiboi, abhilash",
+  "author": "sukhiboi",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
