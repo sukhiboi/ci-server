@@ -14,7 +14,7 @@ const getJobDetails = function (payload, jobId) {
   const repoDetails = ['cloneUrl', clone_url, 'repoName', name, 'id', id];
   const commitDetails = ['author', author.name, 'commitMessage', message];
   const jobDetails = ['status', 'scheduled', 'jobId', jobId];
-  return [...repoDetails, ...commitDetails, ...jobDetails];
+  return [...repoDetails, ...commitDetails, ...jobDetails, 'scheduledAt', new Date().toJSON()];
 };
 
 const createJob = function (id, req) {
