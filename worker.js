@@ -2,10 +2,10 @@ const http = require('http');
 const { lintRepo } = require('./lint');
 
 const options = {
-  host: 'https://linter-step.herokuapp.com',
+  host: 'localhost',
   path: '/job',
   method: 'GET',
-  port: 19525,
+  port: 4000,
 };
 
 const getJob = function () {

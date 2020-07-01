@@ -11,14 +11,12 @@ let id = 0;
 
 const scheduleJob = function (req, res) {
   console.log(`scheduled job ${id}`);
-  console.log({ ...req.body, id: id++ });
   jobs.push({ ...req.body, id: id++ });
   res.send('scheduled');
 };
 
 app.post('/payload', scheduleJob);
 app.get('/job', (req, res) => {
-  console.log('worker hit');
   if (jobs.length) {
     res.json(jobs.shift());
   } else {
