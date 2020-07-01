@@ -11,10 +11,8 @@ let id = 0;
 
 const scheduleJob = function (req, res) {
   console.log(`scheduled job ${id}`);
-  const jobDetails = Object.keys(req.body.repository).reduce((details, key) => {
-    return [...details, key, req.body.repository[key]];
-  }, []);
-  client.hset(`job${id}`, jobDetails);
+  const { clone_url, name } = req.body.repository;
+  client.hset(`job${id}`, ['clone_url', clone_url, 'name', name]);
   client.lpush('queue', `job${id++}`, () => {
     res.send('scheduled');
   });
