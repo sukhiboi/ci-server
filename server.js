@@ -17,6 +17,7 @@ const scheduleJob = function (req, res) {
 
 app.post('/payload', scheduleJob);
 app.get('/job', (req, res) => {
+  console.log('worker hit');
   if (jobs.length) {
     res.json(jobs.shift());
   } else {
