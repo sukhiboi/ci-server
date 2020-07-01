@@ -36,6 +36,15 @@ const scheduleJob = function (req, res) {
 };
 
 app.post('/payload', scheduleJob);
+app.get('/lint-results/:id', (req, res) => {
+  client.hgetall(`job${req.params.id}`, (err, reply) => {
+    if (err) {
+      res.end('invalid id');
+    } else {
+      res.end(JSON.stringify(reply));
+    }
+  });
+});
 
 const PORT = process.env.PORT || defaultPort;
 app.listen(PORT, () => console.log(`listening to ${PORT}`));
