@@ -8,12 +8,11 @@ const defaultPort = 4000;
 app.use(bodyParser.json());
 
 const getJobDetails = function (payload, jobId) {
-  const { clone_url, name } = payload.repository;
-  const { id, sha } = payload;
+  const { id, clone_url, name } = payload.repository;
   const [commit] = payload.commits;
   const { message, author } = commit;
   const repoDetails = ['clone_url', clone_url, 'name', name, 'id', id];
-  const commitDetails = ['sha', sha, 'author', author.name, 'message', message];
+  const commitDetails = ['author', author.name, 'message', message];
   const jobDetails = ['status', 'scheduled', 'jobId', jobId];
   console.log([...repoDetails, ...commitDetails, ...jobDetails]);
   return [...repoDetails, ...commitDetails, ...jobDetails];
