@@ -28,7 +28,7 @@ const scheduleJob = function (req, res) {
     } else {
       createJob(id, req).then(() => {
         client.lpush('queue', `job${id}`, () => {
-          res.send('scheduled');
+          res.send(`scheduled | job id ${id}`);
         });
       });
     }
