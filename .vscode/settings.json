@@ -4,6 +4,7 @@
         "brpop",
         "eslintignore",
         "hgetall",
+        "hmset",
         "hset",
         "lpush"
     ]
