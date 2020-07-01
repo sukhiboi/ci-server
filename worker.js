@@ -5,7 +5,7 @@ const options = {
   host: 'https://linter-step.herokuapp.com',
   path: '/job',
   method: 'GET',
-  port: 29325,
+  port: 19525,
 };
 
 const getJob = function () {
