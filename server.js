@@ -10,10 +10,10 @@ app.use(bodyParser.json());
 const getJobDetails = function (payload, jobId) {
   const { clone_url, name } = payload.repository;
   const { id, sha } = payload;
-  const author = payload.commit.commit.author.name;
-  const message = payload.commit.commit.message;
+  const [commit] = payload.commits;
+  const { message, author } = commit;
   const repoDetails = ['clone_url', clone_url, 'name', name, 'id', id];
-  const commitDetails = ['sha', sha, 'author', author, 'message', message];
+  const commitDetails = ['sha', sha, 'author', author.name, 'message', message];
   const jobDetails = ['status', 'scheduled', 'jobId', jobId];
   console.log([...repoDetails, ...commitDetails, ...jobDetails]);
   return [...repoDetails, ...commitDetails, ...jobDetails];
