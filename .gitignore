@@ -1,1 +1,4 @@
 node_modules
+worker.js
+jobs.sh
+lint.js

@@ -1,6 +1,10 @@
 {
     "cSpell.words": [
         "Listr",
-        "eslintignore"
+        "brpop",
+        "eslintignore",
+        "hgetall",
+        "hset",
+        "lpush"
     ]
 }
