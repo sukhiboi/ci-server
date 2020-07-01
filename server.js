@@ -7,10 +7,20 @@ const client = redis.createClient(process.env.REDIS_URL);
 const defaultPort = 4000;
 app.use(bodyParser.json());
 
+const getJobDetails = function (payload, jobId) {
+  const { clone_url, name } = payload.repository;
+  const { id, sha } = payload;
+  const author = payload.commit.author.name;
+  const message = payload.commit.message;
+  const repoDetails = ['clone_url', clone_url, 'name', name, 'id', id];
+  const commitDetails = ['sha', sha, 'author', author, 'message', message];
+  const jobDetails = ['status', 'scheduled', 'jobId', jobId];
+  return [...repoDetails, ...commitDetails, ...jobDetails];
+};
+
 const createJob = function (id, req) {
   return new Promise((res, rej) => {
-    const { clone_url, name } = req.body.repository;
-    client.hmset(`job${id}`, ['clone_url', clone_url, 'name', name], (err) => {
+    client.hmset(`job${id}`, getJobDetails(req.body, id), (err) => {
       if (err) {
         rej('unable to create job');
       } else {
