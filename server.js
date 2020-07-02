@@ -8,7 +8,6 @@ const defaultPort = 4000;
 app.use(bodyParser.json());
 
 const getJobDetails = function (payload, jobId) {
-  console.log(payload);
   const { id, clone_url, name } = payload.repository;
   const [commit] = payload.commits;
   const { message, author } = commit;
@@ -42,12 +41,14 @@ const scheduleJob = function (req, res) {
     if (err) {
       console.error('unable to increment id');
     } else {
-      console.log(req.body)
-      createJob(id, req).then(() => {
-        client.lpush('queue', `job${id}`, () => {
-          res.send(`scheduled | job id ${id}`);
+      if (!req.body.repository) {
+        return res.send('Invalid options')
+      }
+        createJob(id, req).then(() => {
+          client.lpush('queue', `job${id}`, () => {
+            res.send(`scheduled | job id ${id}`);
+          });
         });
-      });
     }
   });
 };
