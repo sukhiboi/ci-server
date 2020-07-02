@@ -42,13 +42,15 @@ const scheduleJob = function (req, res) {
       console.error('unable to increment id');
     } else {
       if (!req.body.repository) {
-        return res.send('Invalid options')
+        return res.send('Invalid options');
       }
-        createJob(id, req).then(() => {
-          client.lpush('queue', `job${id}`, () => {
+      createJob(id, req).then(() => {
+        client.lpush('lintQueue', `job${id}`, () => {
+          client.lpush('testQueue', `job${id}`, () => {
             res.send(`scheduled | job id ${id}`);
           });
         });
+      });
     }
   });
 };
