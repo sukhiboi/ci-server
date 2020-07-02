@@ -42,6 +42,7 @@ const scheduleJob = function (req, res) {
     if (err) {
       console.error('unable to increment id');
     } else {
+      console.log(req.body)
       createJob(id, req).then(() => {
         client.lpush('queue', `job${id}`, () => {
           res.send(`scheduled | job id ${id}`);
