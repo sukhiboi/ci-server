@@ -3,68 +3,60 @@ const app = express();
 const bodyParser = require('body-parser');
 const redis = require('redis');
 const client = redis.createClient(process.env.REDIS_URL);
+const { increment, lpush, hmset, hgetall } = require('./redisFunctions');
 
-const defaultPort = 4000;
+const getJobDetails = function (githubPayload, jobId) {
+  const { head_commit, repository } = githubPayload;
+  const { message, author, id, timestamp } = head_commit;
+  const details = {
+    jobId,
+    status: 'scheduled',
+    id: repository.id,
+    repoName: repository.name,
+    commitSHA: id,
+    author: author.name,
+    commitMessage: message,
+    committedAt: timestamp,
+    cloneUrl: repository.clone_url,
+    scheduledAt: new Date().toJSON(),
+  };
+  const parsedDetails = Object.keys(details).reduce((parsed, detail) => {
+    return [...parsed, detail, details[detail]];
+  }, []);
+  return parsedDetails;
+};
+
+const scheduleJob = async function (request, response) {
+  try {
+    const id = await increment(client, 'current_id');
+    const jobId = 'job' + id;
+    const githubPayload = request.body;
+    if (githubPayload.repository === undefined) {
+      throw new Error('Invalid Github Payload');
+    }
+    const jobDetails = getJobDetails(githubPayload, jobId);
+    await hmset(client, jobId, jobDetails);
+    await lpush(client, 'lintQueue', jobId);
+    await lpush(client, 'testQueue', jobId);
+    console.log(`Scheduled ${jobId}`);
+    response.send(`Scheduled ${jobId}`);
+  } catch (err) {
+    response.send(err.message);
+    console.error('Unable to schedule job\n Reason: ', err.message);
+  }
+};
+
 app.use(bodyParser.json());
-
-const getJobDetails = function (payload, jobId) {
-  const { id, clone_url, name } = payload.repository;
-  const [commit] = payload.commits;
-  const { message, author } = commit;
-  const repoDetails = ['cloneUrl', clone_url, 'repoName', name, 'id', id];
-  const commitDetails = ['author', author.name, 'commitMessage', message];
-  const jobDetails = ['status', 'scheduled', 'jobId', jobId];
-  return [
-    ...repoDetails,
-    ...commitDetails,
-    ...jobDetails,
-    'scheduledAt',
-    new Date().toJSON(),
-  ];
-};
-
-const createJob = function (id, req) {
-  return new Promise((res, rej) => {
-    client.hmset(`job${id}`, getJobDetails(req.body, id), (err) => {
-      if (err) {
-        rej('unable to create job');
-      } else {
-        res();
-      }
-    });
-  });
-};
-
-const scheduleJob = function (req, res) {
-  client.incr('current_id', (err, id) => {
-    console.log(`Scheduling job ${id}`);
-    if (err) {
-      console.error('unable to increment id');
-    } else {
-      if (!req.body.repository) {
-        return res.send('Invalid options');
-      }
-      createJob(id, req).then(() => {
-        client.lpush('lintQueue', `job${id}`, () => {
-          client.lpush('testQueue', `job${id}`, () => {
-            res.send(`scheduled | job id ${id}`);
-          });
-        });
-      });
-    }
-  });
-};
-
 app.post('/payload', scheduleJob);
-app.get('/lint-results/:id', (req, res) => {
-  client.hgetall(`job${req.params.id}`, (err, reply) => {
-    if (err) {
-      res.end('invalid id');
-    } else {
-      res.end(JSON.stringify(reply));
-    }
-  });
+app.get('/lint-result/:id', async (request, response) => {
+  try {
+    const jobId = `job${request.params.id}`;
+    const jobDetails = await hgetall(client, jobId);
+    response.send(JSON.stringify(jobDetails));
+  } catch (err) {
+    response.send(`ERROR OCCURRED\n\n ${err.message}`);
+  }
 });
 
-const PORT = process.env.PORT || defaultPort;
-app.listen(PORT, () => console.log(`listening to ${PORT}`));
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));

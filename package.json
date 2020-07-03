@@ -4,8 +4,8 @@
   "description": "created by sukhiboi",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "nyc mocha"
+    "server": "node server.js",
+    "test": "mocha"
   },
   "keywords": [
     "linter"
