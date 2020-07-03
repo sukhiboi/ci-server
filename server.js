@@ -46,10 +46,7 @@ const scheduleJob = async function (request, response) {
   }
 };
 
-app.use(bodyParser.json());
-app.get('/', (request, response) => response.send('Welcome to step-ci'));
-app.post('/payload', scheduleJob);
-app.get('/lint-result/:id', async (request, response) => {
+const generateLintResults = async function (request, response) {
   try {
     const jobId = `job${request.params.id}`;
     const jobDetails = await hgetall(client, jobId);
@@ -57,7 +54,12 @@ app.get('/lint-result/:id', async (request, response) => {
   } catch (err) {
     response.send(`ERROR OCCURRED\n\n ${err.message}`);
   }
-});
+};
+
+app.use(bodyParser.json());
+app.get('/', (request, response) => response.send('Welcome to step-ci'));
+app.post('/payload', scheduleJob);
+app.get('/lint-result/:id', generateLintResults);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
