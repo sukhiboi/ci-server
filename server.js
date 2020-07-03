@@ -26,6 +26,13 @@ const getJobDetails = function (githubPayload, jobId) {
   return parsedDetails;
 };
 
+const updateJobInRedis = async function (client, jobId, jobDetails) {
+  await hmset(client, jobId, jobDetails);
+  await lpush(client, 'lintQueue', jobId);
+  await lpush(client, 'testQueue', jobId);
+  console.log(`Scheduled ${jobId}`);
+};
+
 const scheduleJob = async function (request, response) {
   try {
     const id = await increment(client, 'current_id');
@@ -35,10 +42,7 @@ const scheduleJob = async function (request, response) {
       throw new Error('Invalid Github Payload');
     }
     const jobDetails = getJobDetails(githubPayload, jobId);
-    await hmset(client, jobId, jobDetails);
-    await lpush(client, 'lintQueue', jobId);
-    await lpush(client, 'testQueue', jobId);
-    console.log(`Scheduled ${jobId}`);
+    await updateJobInRedis(client, jobId, jobDetails);
     response.send(`Scheduled ${jobId}`);
   } catch (err) {
     response.send(err.message);
