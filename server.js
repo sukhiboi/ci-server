@@ -47,6 +47,7 @@ const scheduleJob = async function (request, response) {
 };
 
 app.use(bodyParser.json());
+app.get('/', (request, response) => response.send('Welcome to step-ci'));
 app.post('/payload', scheduleJob);
 app.get('/lint-result/:id', async (request, response) => {
   try {
