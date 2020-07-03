@@ -1,15 +1,12 @@
 {
-  "name": "linter",
+  "name": "ci-step",
   "version": "1.0.0",
-  "description": "created by sukhiboi",
-  "main": "index.js",
+  "description": "A ci tool work on concepts of pull based system",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "mocha"
   },
-  "keywords": [
-    "linter"
-  ],
   "author": "sukhiboi",
   "license": "ISC",
   "dependencies": {
@@ -17,9 +14,7 @@
     "chai": "^4.2.0",
     "eslint": "^7.3.1",
     "express": "^4.17.1",
-    "listr": "^0.14.3",
     "mocha": "^8.0.1",
-    "nyc": "^15.1.0",
     "redis": "^3.0.2"
   },
   "directories": {
@@ -28,10 +23,10 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sukhiboi/linter.git"
+    "url": "git+https://github.com/sukhiboi/ci-tool.git"
   },
   "bugs": {
-    "url": "https://github.com/sukhiboi/linter/issues"
+    "url": "https://github.com/sukhiboi/ci-tool/issues"
   },
-  "homepage": "https://github.com/sukhiboi/linter#readme"
+  "homepage": "https://github.com/sukhiboi/ci-tool#readme"
 }
