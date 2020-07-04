@@ -26,38 +26,46 @@ const getJobDetails = function (githubPayload, jobId) {
   return parsedDetails;
 };
 
-const updateJobInRedis = async function (client, jobId, jobDetails) {
-  await hmset(client, jobId, jobDetails);
-  await lpush(client, 'lintQueue', jobId);
-  await lpush(client, 'testQueue', jobId);
-  console.log(`Scheduled ${jobId}`);
+const updateJobInRedis = function (client, jobId, jobDetails) {
+  return new Promise((resolve, reject) => {
+    hmset(client, jobId, jobDetails)
+      .then(() => lpush(client, 'lintQueue', jobId))
+      .then(() => lpush(client, 'testQueue', jobId))
+      .then(() => {
+        console.log(`Scheduled ${jobId}`);
+        resolve();
+      })
+      .catch(reject);
+  });
 };
 
-const scheduleJob = async function (request, response) {
-  try {
-    const id = await increment(client, 'current_id');
-    const jobId = 'job' + id;
-    const githubPayload = request.body;
-    if (githubPayload.repository === undefined) {
-      throw new Error('Invalid Github Payload');
-    }
-    const jobDetails = getJobDetails(githubPayload, jobId);
-    await updateJobInRedis(client, jobId, jobDetails);
-    response.send(`Scheduled ${jobId}`);
-  } catch (err) {
-    response.send(err.message);
-    console.error('Unable to schedule job\n Reason: ', err.message);
-  }
+const scheduleJob = function (request, response) {
+  increment(client, 'current_id')
+    .then((id) => {
+      const jobId = `job${id}`;
+      const githubPayload = request.body;
+      if (githubPayload.repository === undefined) {
+        throw new Error('Invalid Github Payload');
+      }
+      const jobDetails = getJobDetails(githubPayload, jobId);
+      updateJobInRedis(client, jobId, jobDetails)
+        .then(() => response.send(`Scheduled ${jobId}`))
+        .catch((err) => {
+          response.send(err.message);
+          console.error('Unable to schedule job\n Reason: ', err.message);
+        });
+    })
+    .catch((err) => {
+      response.send(err.message);
+      console.error('Unable to schedule job\n Reason: ', err.message);
+    });
 };
 
 const generateLintResults = async function (request, response) {
-  try {
-    const jobId = `job${request.params.id}`;
-    const jobDetails = await hgetall(client, jobId);
-    response.send(JSON.stringify(jobDetails));
-  } catch (err) {
-    response.send(`ERROR OCCURRED\n\n ${err.message}`);
-  }
+  const jobId = `job${request.params.id}`;
+  hgetall(client, jobId)
+    .then(() => response.send(JSON.stringify(jobDetails)))
+    .catch((err) => response.send(`ERROR OCCURRED\n\n ${err.message}`));
 };
 
 app.use(bodyParser.json());
