@@ -71,7 +71,7 @@ const generateLintResults = function (request, response) {
 app.use(bodyParser.json());
 app.get('/', (request, response) => response.send('Welcome to step-ci'));
 app.post('/payload', scheduleJob);
-app.get('/lint-results/:id', generateLintResults);
+app.get('/results/:id', generateLintResults);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
