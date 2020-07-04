@@ -61,10 +61,10 @@ const scheduleJob = function (request, response) {
     });
 };
 
-const generateLintResults = async function (request, response) {
+const generateLintResults = function (request, response) {
   const jobId = `job${request.params.id}`;
   hgetall(client, jobId)
-    .then(() => response.send(JSON.stringify(jobDetails)))
+    .then((jobDetails) => response.send(jobDetails.lint))
     .catch((err) => response.send(`ERROR OCCURRED\n\n ${err.message}`));
 };
 
