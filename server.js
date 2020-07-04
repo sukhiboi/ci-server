@@ -71,8 +71,8 @@ const generateLintResults = function (request, response) {
     .catch((err) => response.send(`ERROR OCCURRED\n\n ${err.message}`));
 };
 
+app.use(express.static('public'));
 app.use(bodyParser.json());
-app.get('/', (request, response) => response.send('Welcome to step-ci'));
 app.post('/payload', scheduleJob);
 app.get('/results/:id', generateLintResults);
 
