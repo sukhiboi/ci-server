@@ -44,7 +44,10 @@ const scheduleJob = function (request, response) {
     .then((id) => {
       const jobId = `job${id}`;
       const githubPayload = request.body;
-      if (githubPayload.repository === undefined) {
+      const isValidGithubPayload =
+        githubPayload.repository !== undefined &&
+        githubPayload.head_commit !== undefined;
+      if (!isValidGithubPayload) {
         throw new Error('Invalid Github Payload');
       }
       const jobDetails = getJobDetails(githubPayload, jobId);
