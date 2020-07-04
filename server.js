@@ -81,12 +81,12 @@ const getAllJobs = function (request, response) {
     .then((jobs) => {
       const jobDetails = jobs.map((job) => hgetall(client, job));
       Promise.all(jobDetails).then((details) => {
-        const response = details.reduce((allDetails, detail) => {
+        const jobData = details.reduce((allDetails, detail) => {
           const previousDetails = { ...allDetails };
           previousDetails[detail.jobId] = detail;
           return previousDetails;
         }, {});
-        response.json(response);
+        response.json(jobData);
       });
     })
     .catch((err) => response.send(err));
