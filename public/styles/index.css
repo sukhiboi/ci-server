@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;900&display=swap");
+html {
+  font-family: Roboto;
+}
+
+.header {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  padding: 1rem 0 2rem;
+}
+
+#root {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 0 2rem;
+}
+
+.table-head {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  font-weight: 500 !important;
+  font-size: 1.4rem !important;
+}
+
+.result {
+  padding: 1.5rem 2rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.result > div {
+  padding: 0 2rem 0 0;
+}
+
+.result > div > a {
+  text-decoration: none;
+  color: #000;
+}
+
+.result > div > a:hover {
+  text-decoration: underline;
+}
+
+.result > div:first-child {
+  padding-left: 0;
+}
+
+.result > div:last-child {
+  padding-right: 0;
+}
+
+.repoName {
+  width: 30vw;
+}
+
+.status {
+  width: 12vw;
+  text-align: center;
+}
+
+.timeStatus {
+  width: 10vw;
+  text-align: center;
+}
+/*# sourceMappingURL=index.css.map */

@@ -1,9 +1,14 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
 const redis = require('redis');
 const client = redis.createClient(process.env.REDIS_URL);
-const { increment, lpush, hmset, hgetall } = require('./redisFunctions');
+const { increment, lpush, hmset, hgetall, keys } = require('./redisFunctions');
+
+app.use(express.static('public'));
+app.use(bodyParser.json());
+app.use(morgan('dev'));
 
 const getJobDetails = function (githubPayload, jobId) {
   const { head_commit, repository } = githubPayload;
@@ -71,8 +76,23 @@ const generateLintResults = function (request, response) {
     .catch((err) => response.send(`ERROR OCCURRED\n\n ${err.message}`));
 };
 
-app.use(express.static('public'));
-app.use(bodyParser.json());
+const getAllJobs = function (request, response) {
+  keys(client, 'job*')
+    .then((jobs) => {
+      const jobDetails = jobs.map((job) => hgetall(client, job));
+      Promise.all(jobDetails).then((details) => {
+        const response = details.reduce((allDetails, detail) => {
+          const previousDetails = { ...allDetails };
+          previousDetails[detail.jobId] = detail;
+          return previousDetails;
+        }, {});
+        response.json(response);
+      });
+    })
+    .catch((err) => response.send(err));
+};
+
+app.get('/details', getAllJobs);
 app.post('/payload', scheduleJob);
 app.get('/results/:id', generateLintResults);
 
