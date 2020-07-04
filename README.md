@@ -41,7 +41,7 @@ It will listen to a port available in the environment (environment variable) by 
 
 Go to your repo > Settings > Webhooks > Add Webhook  
 
-It's simple just copy this URL https://ci-step.herokuapp.com and paste it as you payload. 
+It's simple just copy this URL https://ci-step.herokuapp.com/payload and paste it as you payload. 
 
 Select content type as application/json. 
 
