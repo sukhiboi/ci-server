@@ -64,14 +64,14 @@ const scheduleJob = function (request, response) {
 const generateLintResults = function (request, response) {
   const jobId = `job${request.params.id}`;
   hgetall(client, jobId)
-    .then((jobDetails) => response.send(jobDetails.lint))
+    .then((jobDetails) => response.send(jobDetails))
     .catch((err) => response.send(`ERROR OCCURRED\n\n ${err.message}`));
 };
 
 app.use(bodyParser.json());
 app.get('/', (request, response) => response.send('Welcome to step-ci'));
 app.post('/payload', scheduleJob);
-app.get('/lint-result/:id', generateLintResults);
+app.get('/lint-results/:id', generateLintResults);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
