@@ -31,8 +31,8 @@ const getJobDetails = function (githubPayload, jobId) {
     commitMessage: message,
     committedAt: timestamp,
     cloneUrl: repository.clone_url,
-    lintingScheduledAt: new Date().toJSON(),
-    testingScheduledAt: new Date().toJSON(),
+    lintScheduledAt: new Date().toJSON(),
+    testScheduledAt: new Date().toJSON(),
   };
   const parsedDetails = Object.keys(details).reduce((parsed, detail) => {
     return [...parsed, detail, details[detail]];
