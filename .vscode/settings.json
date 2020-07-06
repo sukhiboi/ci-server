@@ -6,6 +6,8 @@
         "hgetall",
         "hmset",
         "hset",
-        "lpush"
+        "lpush",
+        "sadd",
+        "scard"
     ]
 }

@@ -26,14 +26,8 @@ const createResultRow = function (result) {
   div.className = 'result';
   div.appendChild(createDiv(undefined, result.jobId));
   div.appendChild(createDiv('repoName', result.repoName));
-  div.appendChild(createDiv('status', result.status));
-  div.appendChild(createDiv('status', result.status));
-  div.appendChild(
-    createDiv('timeStatus', diffDates(result.scheduledAt, result.pickedAt))
-  );
-  div.appendChild(
-    createDiv('timeStatus', diffDates(result.pickedAt, result.completedAt))
-  );
+  div.appendChild(createDiv('status', result.lintingStatus));
+  div.appendChild(createDiv('status', result.testingStatus));
   return div;
 };
 

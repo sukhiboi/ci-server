@@ -40,6 +40,7 @@ html {
     }
     &:first-child {
       padding-left: 0;
+      width: 8vw;
     }
     &:last-child {
       padding-right: 0;
@@ -48,15 +49,10 @@ html {
 }
 
 .repoName {
-  width: 30vw;
+  width: -webkit-fill-available;
 }
 
 .status {
-  width: 12vw;
-  text-align: center;
-}
-
-.timeStatus {
-  width: 10vw;
+  width: 16vw;
   text-align: center;
 }

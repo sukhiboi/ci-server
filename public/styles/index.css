@@ -46,6 +46,7 @@ html {
 
 .result > div:first-child {
   padding-left: 0;
+  width: 8vw;
 }
 
 .result > div:last-child {
@@ -53,16 +54,11 @@ html {
 }
 
 .repoName {
-  width: 30vw;
+  width: -webkit-fill-available;
 }
 
 .status {
-  width: 12vw;
-  text-align: center;
-}
-
-.timeStatus {
-  width: 10vw;
+  width: 16vw;
   text-align: center;
 }
 /*# sourceMappingURL=index.css.map */

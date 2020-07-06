@@ -4,7 +4,14 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const redis = require('redis');
 const client = redis.createClient(process.env.REDIS_URL);
-const { increment, lpush, hmset, hgetall, keys } = require('./redisFunctions');
+const {
+  increment,
+  lpush,
+  hmset,
+  hgetall,
+  keys,
+  scard,
+} = require('./redisFunctions');
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -15,7 +22,8 @@ const getJobDetails = function (githubPayload, jobId) {
   const { message, author, id, timestamp } = head_commit;
   const details = {
     jobId,
-    status: 'scheduled',
+    lintingStatus: 'scheduled',
+    testingStatus: 'scheduled',
     id: repository.id,
     repoName: repository.name,
     commitSHA: id,
@@ -23,7 +31,8 @@ const getJobDetails = function (githubPayload, jobId) {
     commitMessage: message,
     committedAt: timestamp,
     cloneUrl: repository.clone_url,
-    scheduledAt: new Date().toJSON(),
+    lintingScheduledAt: new Date().toJSON(),
+    testingScheduledAt: new Date().toJSON(),
   };
   const parsedDetails = Object.keys(details).reduce((parsed, detail) => {
     return [...parsed, detail, details[detail]];
