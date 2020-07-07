@@ -17,10 +17,11 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
-const getJobDetails = function (githubPayload, jobId) {
+const getJobDetails = function (githubPayload, jobId, receivedAt) {
   const { head_commit, repository } = githubPayload;
   const { message, author, id, timestamp } = head_commit;
   const details = {
+    receivedAt,
     jobId,
     lintingStatus: 'scheduled',
     testingStatus: 'scheduled',
@@ -54,6 +55,7 @@ const updateJobInRedis = function (client, jobId, jobDetails) {
 };
 
 const scheduleJob = function (request, response) {
+  const receivedAt = new Date().toJSON();
   increment(client, 'current_id')
     .then((id) => {
       const jobId = `job${id}`;
@@ -64,7 +66,7 @@ const scheduleJob = function (request, response) {
       if (!isValidGithubPayload) {
         throw new Error('Invalid Github Payload');
       }
-      const jobDetails = getJobDetails(githubPayload, jobId);
+      const jobDetails = getJobDetails(githubPayload, jobId, receivedAt);
       updateJobInRedis(client, jobId, jobDetails)
         .then(() => response.send(`Scheduled ${jobId}`))
         .catch((err) => {
@@ -78,7 +80,7 @@ const scheduleJob = function (request, response) {
     });
 };
 
-const generateLintResults = function (request, response) {
+const generateResults = function (request, response) {
   const jobId = `job${request.params.id}`;
   hgetall(client, jobId)
     .then((jobDetails) => response.send(jobDetails))
@@ -101,9 +103,44 @@ const getAllJobs = function (request, response) {
     .catch((err) => response.send(err));
 };
 
+const generateBenchmarkResults = function (request, response) {
+  const { workerCount } = request.params;
+  keys(client, 'job*')
+    .then((jobs) => {
+      const jobDetails = jobs.map((job) => hgetall(client, job));
+      Promise.all(jobDetails).then((details) => {
+        const benchmarkReport = details.map((jobDetail) => {
+          const {
+            lintScheduledAt,
+            lintStartedAt,
+            lintCompletedAt,
+            receivedAt,
+            jobId,
+          } = jobDetail;
+          return {
+            jobId,
+            receivedAt,
+            queuedAt: lintScheduledAt,
+            beganAt: lintStartedAt,
+            finishedAt: lintCompletedAt,
+          };
+        });
+        response.json({ workerCount, report: benchmarkReport });
+      });
+    })
+    .catch((err) => response.send(err));
+};
+
 app.get('/details', getAllJobs);
 app.post('/payload', scheduleJob);
-app.get('/results/:id', generateLintResults);
+app.get('/results/:id', generateResults);
+app.get('/benchmark/:workerCount', generateBenchmarkResults);
+app.get('/job-done-count', (request, response) => {
+  scard(client, 'completedLintJobs').then((completedJobCount) => {
+    response.send(`${completedJobCount}`);
+    response.end();
+  });
+});
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
