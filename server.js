@@ -96,7 +96,7 @@ const getAllJobs = function () {
 };
 
 const generateBenchmarkResults = function (request, response) {
-  const { jobType } = request.params;
+  const jobType = request.params.jobType.toLocaleLowerCase();
   getAllJobs()
     .then((jobs) => {
       const benchmarkReport = jobs.map((job) => {
