@@ -120,7 +120,20 @@ const getCompleteJobCount = function (request, response) {
   });
 };
 
-app.get('/details', getAllJobs);
+const sendJobsToWebClient = function (request, response) {
+  getAllJobs()
+    .then((details) => {
+      const jobData = details.reduce((allDetails, detail) => {
+        const previousDetails = { ...allDetails };
+        previousDetails[detail.jobId] = detail;
+        return previousDetails;
+      }, {});
+      response.json(jobData);
+    })
+    .catch((err) => response.send(`${err}`));
+};
+
+app.get('/details', sendJobsToWebClient);
 app.post('/payload', scheduleJob);
 app.get('/results/:id', generateResults);
 app.get('/benchmark/:jobType', generateBenchmarkResults);
