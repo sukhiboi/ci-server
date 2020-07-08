@@ -67,12 +67,9 @@ const scheduleJob = function (request, response) {
         throw new Error('Invalid Github Payload');
       }
       const jobDetails = getJobDetails(githubPayload, jobId, receivedAt);
-      updateJobInRedis(client, jobId, jobDetails)
-        .then(() => response.send(`Scheduled ${jobId}`))
-        .catch((err) => {
-          response.send(err.message);
-          console.error('Unable to schedule job\n Reason: ', err.message);
-        });
+      updateJobInRedis(client, jobId, jobDetails).then(() => {
+        response.send(`Scheduled ${jobId}`);
+      });
     })
     .catch((err) => {
       response.send(err.message);
@@ -87,60 +84,47 @@ const generateResults = function (request, response) {
     .catch((err) => response.send(`ERROR OCCURRED\n\n ${err.message}`));
 };
 
-const getAllJobs = function (request, response) {
-  keys(client, 'job*')
+const getAllJobs = function () {
+  return new Promise((resolve, reject) => {
+    keys(client, 'job*')
+      .then((jobs) => {
+        const jobDetails = jobs.map((job) => hgetall(client, job));
+        Promise.all(jobDetails).then(resolve);
+      })
+      .catch(reject);
+  });
+};
+
+const generateBenchmarkResults = function (request, response) {
+  const { jobType } = request.params;
+  getAllJobs()
     .then((jobs) => {
-      const jobDetails = jobs.map((job) => hgetall(client, job));
-      Promise.all(jobDetails).then((details) => {
-        const jobData = details.reduce((allDetails, detail) => {
-          const previousDetails = { ...allDetails };
-          previousDetails[detail.jobId] = detail;
-          return previousDetails;
-        }, {});
-        response.json(jobData);
+      const benchmarkReport = jobs.map((job) => {
+        return {
+          jobId: job.jobId,
+          receivedAt: job.receivedAt,
+          queuedAt: job[`${jobType}ScheduledAt`],
+          beganAt: job[`${jobType}StartedAt`],
+          finishedAt: job[`${jobType}CompletedAt`],
+        };
       });
+      response.json(benchmarkReport);
     })
     .catch((err) => response.send(err));
 };
 
-const generateBenchmarkResults = function (request, response) {
-  const { workerCount } = request.params;
-  keys(client, 'job*')
-    .then((jobs) => {
-      const jobDetails = jobs.map((job) => hgetall(client, job));
-      Promise.all(jobDetails).then((details) => {
-        const benchmarkReport = details.map((jobDetail) => {
-          const {
-            lintScheduledAt,
-            lintStartedAt,
-            lintCompletedAt,
-            receivedAt,
-            jobId,
-          } = jobDetail;
-          return {
-            jobId,
-            receivedAt,
-            queuedAt: lintScheduledAt,
-            beganAt: lintStartedAt,
-            finishedAt: lintCompletedAt,
-          };
-        });
-        response.json({ workerCount, report: benchmarkReport });
-      });
-    })
-    .catch((err) => response.send(err));
+const getCompleteJobCount = function (request, response) {
+  const { jobType } = request.params;
+  scard(client, `completed${jobType}Jobs`).then((completedJobCount) => {
+    response.send(`${completedJobCount}`);
+  });
 };
 
 app.get('/details', getAllJobs);
 app.post('/payload', scheduleJob);
 app.get('/results/:id', generateResults);
-app.get('/benchmark/:workerCount', generateBenchmarkResults);
-app.get('/job-done-count', (request, response) => {
-  scard(client, 'completedLintJobs').then((completedJobCount) => {
-    response.send(`${completedJobCount}`);
-    response.end();
-  });
-});
+app.get('/benchmark/:jobType', generateBenchmarkResults);
+app.get('/complete-job-count/:jobType', getCompleteJobCount);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
