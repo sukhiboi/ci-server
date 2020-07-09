@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const redis = require('redis');
 const client = redis.createClient(process.env.REDIS_URL);
-const { increment, lpush, hmset, hgetall, keys } = require('./redisFunctions');
+const { increment, lpush, hmset, hgetall, keys } = require('./lib/redisFunctions');
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
