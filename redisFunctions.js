@@ -43,13 +43,4 @@ const keys = function (client, key) {
   });
 };
 
-const scard = function (client, key) {
-  return new Promise((resolve, reject) => {
-    client.scard(key, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-};
-
-module.exports = { increment, lpush, hmset, hgetall, keys, scard };
+module.exports = { increment, lpush, hmset, hgetall, keys };
