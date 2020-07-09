@@ -6,9 +6,25 @@ const createJobCard = function (job) {
     repoName,
     testingStatus,
     lintingStatus,
+    lintStartedAt,
+    lintScheduledAt,
+    lintCompletedAt,
+    testStartedAt,
+    testScheduledAt,
+    testCompletedAt,
   } = job;
   const [, id] = jobId.split('job');
   const sha = commitSHA.slice(0, 6);
+  const totalWaitingTime =
+    +new Date(lintStartedAt) -
+    +new Date(lintScheduledAt) +
+    +new Date(testStartedAt) -
+    +new Date(testScheduledAt);
+  const totalExecutionTime =
+    +new Date(lintCompletedAt) -
+    +new Date(lintStartedAt) +
+    +new Date(testCompletedAt) -
+    +new Date(testStartedAt);
   const html = `
   <div class="card status-${testingStatus}">
     <div class="card-segment">
@@ -19,8 +35,12 @@ const createJobCard = function (job) {
     </div>
     <div class="card-segment">
       <div class="job-id">#${id}</div>
-      <div class="details">Waiting time <span>2 min</span></div>
-      <div class="details">Execution time <span>2 min</span></div>
+      <div class="details">Waiting time <span>${
+        totalWaitingTime / 1000
+      }</span></div>
+      <div class="details">Execution time <span>${
+        totalExecutionTime / 1000
+      }</span></div>
     </div>
   </div>
   `;
