@@ -1,35 +1,46 @@
-const createDiv = function (className, status) {
-  const div = document.createElement('div');
-  if (className) div.className = className;
-  div.innerText = status;
-  return div;
-};
-
-const createResultRow = function (result) {
-  const div = document.createElement('div');
-  div.className = 'result';
-  div.appendChild(createDiv(undefined, result.jobId));
-  div.appendChild(createDiv('repoName', result.repoName));
-  div.appendChild(createDiv('status', result.lintingStatus));
-  div.appendChild(createDiv('status', result.testingStatus));
-  return div;
-};
-
-const addResults = function (results) {
-  const root = document.getElementById('results');
-  root.innerHTML = '';
-  Object.keys(results)
-    .sort((a, b) => b.split('job')[1] - a.split('job')[1])
-    .forEach((job) => {
-      const div = createResultRow(results[job]);
-      root.appendChild(div);
-    });
+const createJobCard = function (job) {
+  const {
+    commitSHA,
+    jobId,
+    cloneURL,
+    repoName,
+    testingStatus,
+    lintingStatus,
+  } = job;
+  const [, id] = jobId.split('job');
+  const sha = commitSHA.slice(0, 6);
+  const html = `
+  <div class="card status-${testingStatus}">
+    <div class="card-segment">
+      <div class="repo-name"><a href="${cloneURL}">${repoName}</a></div>
+      <div class="details">Linting <span>${lintingStatus}</span></div>
+      <div class="details">Testing <span>${testingStatus}</span></div>
+      <div class="details">SHA <span>${sha}</span></div>
+    </div>
+    <div class="card-segment">
+      <div class="job-id">#${id}</div>
+      <div class="details">Waiting time <span>2 min</span></div>
+      <div class="details">Execution time <span>2 min</span></div>
+    </div>
+  </div>
+  `;
+  return html;
 };
 
 const getResults = function () {
-  fetch('/details')
+  fetch('/results')
     .then((res) => res.json())
-    .then((jobs) => addResults(jobs))
+    .then((jobs) => {
+      const root = document.getElementById('root');
+      const jobIds = Object.keys(jobs);
+      const sortedJobIds = jobIds.sort((job1, job2) => {
+        return job2.split('job')[1] - job1.split('job')[1];
+      });
+      const rootHTML = sortedJobIds.reduce((html, jobId) => {
+        return html + createJobCard(jobs[jobId]);
+      }, '');
+      root.innerHTML = rootHTML;
+    })
     .catch((err) => console.error(err.message));
 };
 

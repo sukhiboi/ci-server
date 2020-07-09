@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;900&display=swap");
 html {
-  font-family: Roboto;
+  font-family: Roboto !important;
 }
 
 .header {
@@ -11,54 +11,83 @@ html {
 }
 
 #root {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  margin: 0 2rem;
-}
-
-.table-head {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
-  font-weight: 500 !important;
-  font-size: 1.4rem !important;
-}
-
-.result {
-  padding: 1.5rem 2rem;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  font-size: 1.2rem;
-  font-weight: 300;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin: 0 2rem;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
 }
 
-.result > div {
-  padding: 0 2rem 0 0;
+.status-completed {
+  background-color: rgba(121, 215, 15, 0.4);
 }
 
-.result > div > a {
-  text-decoration: none;
+.status-scheduled {
+  background-color: rgba(56, 62, 86, 0.4);
+}
+
+.status-processing {
+  background-color: rgba(238, 187, 77, 0.4);
+}
+
+.card {
+  border-radius: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.card-segment {
+  padding: 10px;
+}
+
+.card-segment > div {
+  padding-bottom: 8px;
+}
+
+.card-segment:last-child {
+  text-align: right;
+}
+
+.repo-name {
+  font-weight: 500;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.repo-name > a {
   color: #000;
+  text-decoration: none;
 }
 
-.result > div > a:hover {
+.repo-name > a:hover {
   text-decoration: underline;
 }
 
-.result > div:first-child {
-  padding-left: 0;
-  width: 8vw;
+.details {
+  font-weight: 500;
 }
 
-.result > div:last-child {
-  padding-right: 0;
-}
-
-.repoName {
-  width: -webkit-fill-available;
+.details > span {
+  font-weight: 300;
 }
 
 .status {
-  width: 16vw;
-  text-align: center;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.job-id {
+  font-weight: 900;
+  font-size: 2rem;
 }
 /*# sourceMappingURL=index.css.map */

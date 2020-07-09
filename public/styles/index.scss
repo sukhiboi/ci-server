@@ -1,7 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;900&display=swap');
 
+$completed-status-color: rgba(121, 215, 15, 0.4);
+$processing-status-color: rgba(238, 187, 77, 0.4);
+$scheduled-status-color: rgba(56, 62, 86, 0.4);
+
 html {
-  font-family: Roboto;
+  font-family: Roboto !important;
 }
 
 .header {
@@ -12,47 +16,68 @@ html {
 }
 
 #root {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  margin: 0 2rem;
-}
-
-.table-head {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
-  font-weight: 500 !important;
-  font-size: 1.4rem !important;
-}
-
-.result {
-  padding: 1.5rem 2rem;
   display: flex;
-  font-size: 1.2rem;
-  font-weight: 300;
+  flex-wrap: wrap;
+  margin: 0 2rem;
+  justify-content: space-evenly;
+}
 
+.status-completed {
+  background-color: $completed-status-color;
+}
+
+.status-scheduled {
+  background-color: $scheduled-status-color;
+}
+
+.status-processing {
+  background-color: $processing-status-color;
+}
+
+.card {
+  border-radius: 10px;
+  display: flex;
+  width: fit-content;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.card-segment {
+  padding: 10px;
   & > div {
-    padding: 0 2rem 0 0;
-    & > a {
-      text-decoration: none;
-      color: #000;
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-    &:first-child {
-      padding-left: 0;
-      width: 8vw;
-    }
-    &:last-child {
-      padding-right: 0;
+    padding-bottom: 8px;
+  }
+  &:last-child {
+    text-align: right;
+  }
+}
+
+.repo-name {
+  font-weight: 500;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  & > a {
+    color: #000;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
 
-.repoName {
-  width: -webkit-fill-available;
+.details {
+  font-weight: 500;
+  & > span {
+    font-weight: 300;
+  }
 }
 
 .status {
-  width: 16vw;
-  text-align: center;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.job-id {
+  font-weight: 900;
+  font-size: 2rem;
 }
